@@ -1,0 +1,70 @@
+<!doctype html>
+
+<html>
+  <head>
+	<title>D3 Tutorial</title>
+	<script src="http://d3js.org/d3.v3.min.js"></script>
+  </head>
+
+  <body>
+	  <p>An animated donut chart using data stored in an array.</p>
+    <script>
+    	
+		var data = [10, 25, 42, 50, 80]; 
+		var r = 300; 
+		
+		var color = d3.scale.ordinal()
+			.range(["red", "blue", "orange", "green", "purple"]);
+
+		var canvas = d3.select("body").append("svg")
+				.attr("width", 1500)
+				.attr("height", 1500);
+		
+		
+		var group = canvas.append("g")
+				.attr("transform", "translate(300, 300)"); 
+				
+		
+		// var p = Math.PI * 2;
+//
+		var arc = d3.svg.arc()
+				.innerRadius(150)
+				.outerRadius(r);
+				
+		// group.append("path")
+// 				.attr("d", arc);
+
+		var pie = d3.layout.pie()
+				.value(function(d) { return d; });
+				
+		var arcs = group.selectAll(".arc")
+				.data(pie(data))
+				.enter()
+				.append("g")
+				.attr("class", "src");
+				
+		arcs.append("path")
+				.attr("d", arc)
+			    .attr("fill", function(d, i) { return color(i); })
+			  .transition()
+			    .ease("exp")
+			    .duration(2000)
+			    .attrTween("d", tweenPie);
+
+			function tweenPie(b) {
+			  var i = d3.interpolate({startAngle: 1.1*Math.PI, endAngle: 1.1*Math.PI}, b);
+			  return function(t) { return arc(i(t)); };
+			}
+				
+		arcs.append("text")
+				.attr("transform", function (d) { return "translate(" + arc.centroid(d) + ")"; }) 
+				.attr("text-anchor", "middle")
+				.attr("font-size", "1em")
+				.text(function(d) { return d.data; });
+				
+
+						
+	</script>
+	  
+  </body>
+</html>
